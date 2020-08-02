@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: rest-service
+  name: rest-service
+  namespace: cn202009
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rest-service
+  template:
+    metadata:
+      labels:
+        app: rest-service
+    spec:
+      containers:
+      - image: harbor.edu.cn/cn202009/rest-service:{VERSION}
+        imagePullPolicy: IfNotPresent
+        name: rest-service
+        ports:
+        - containerPort: 7070
+      restartPolicy: Always
+      imagePullSecrets:
+      - name: mytoken
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: rest-service
+  name: rest-service
+  namespace: cn202009
+spec:
+  ports:
+  - name: tcp
+    nodePort: 32574
+    port: 7070
+    protocol: TCP
+    targetPort: 7070
+  selector:
+    app: rest-service
+  type: NodePort
